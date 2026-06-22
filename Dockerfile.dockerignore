@@ -1,0 +1,9 @@
+.devcontainer
+.vscode/
+build
+dist
+target/aarch64/.gitkeep
+target/armv7l/.gitkeep
+target/noarch/.gitkeep
+target/x86_64/.gitkeep
+.gitignore

@@ -1,0 +1,3 @@
+[submodule "src/ndt7-client-go"]
+	path = src/ndt7-client-go
+	url = https://github.com/m-lab/ndt7-client-go.git

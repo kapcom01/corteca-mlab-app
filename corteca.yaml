@@ -1,0 +1,28 @@
+app:
+  author: Nokia
+  dependencies:
+    compile:
+    - go
+    - make
+    runtime:
+    - ca-certificates
+  duid: a88e83ee-1f27-57fa-87f9-db4342ad0130
+  name: mlabs-speedtest
+  version: 3.0.1
+  entrypoint:
+    - /bin/mlabs-nokia
+  runtime:
+    hostname: mlabs
+    linux:
+      resources:
+        cpu:
+          shares: 1024
+          quota: 45
+          period: 100
+        memory:
+          limit: 20971520
+          reservation: 20971520
+          swap: 31457280
+    ociVersion: "1.0.0"
+templates:
+  .corteca/Dockerfile.template: Dockerfile

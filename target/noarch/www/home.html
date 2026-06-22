@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <title>M-Lab's Speed Test</title>
+  <link rel="stylesheet" type="text/css" href="/static/style/main.css">
+  <script src="/static/script/main.js"></script>
+  <script src="/static/script/lottie.min.js"></script>
+</head>
+
+<body>
+  <div id="page">
+    <div id="header">
+      <div class="header-item" id="left">
+        <img id="applicationIcon" src="/static/image/mlab.png" alt="mlab icon" />
+      </div>
+      <div class="header-item" id="center">
+        <span id="title">M-Lab's Speed Test</span>
+      </div>
+      <div class="header-item" id="right">
+        <img id="nokiaLogo" src="static/image/nokia.svg" alt="NOKIA logo" />
+      </div>
+    </div>
+    <div id="form">
+      <form id="speedtestForm" name="speedtestForm" method="post">
+        <div class="row">
+          <div class="centered">
+          {{if eq .TestStatus "not started"}}
+            <div id="initImage">
+              <img id="idle" src="static/image/idle.png" alt="idle">
+            </div>
+          {{end}}
+          {{if eq .TestStatus "Speedtest Running"}}
+            <div id="gauge"></div>
+          {{end}}
+          {{if eq .TestStatus "Finished"}}
+            <div id="doneImage">
+              <img id="done" src="static/image/complete.png" alt="complete">
+            </div>
+          {{end}}
+            <button class="testButton" type="submit" name="formButton" value="testButton" id="testButton" {{if .ButtonDisabled}}disabled{{end}}>
+              Start Test
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="message">
+            <div id="status">
+              <p id="statusMessage" class="statusMessage">
+                Status: {{.TestStatus}}
+              </p>
+            </div>
+          </div>
+        </div>
+        {{if eq .TestStatus "Finished"}}
+          <div class="results-container fade-in">
+            <div class="result-card">
+              <div class="result-label">Download</div>
+              <div class="result-value">{{printf "%.2f" .SpeedtestData.SpeedtestResults.Download}} Mbps</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Upload</div>
+              <div class="result-value">{{printf "%.2f" .SpeedtestData.SpeedtestResults.Upload}} Mbps</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Latency</div>
+              <div class="result-value">{{printf "%.2f" .SpeedtestData.SpeedtestResults.Latency}} ms</div>
+            </div>
+          </div>
+          <div class="server-row fade-in" style="animation-delay:0.3s">
+            <div class="server-label">Server: </div>
+            <div class="server-value">{{.SpeedtestData.SpeedtestResults.ServerName}}</div>
+          </div>
+        {{end}}
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

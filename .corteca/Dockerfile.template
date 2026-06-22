@@ -1,0 +1,38 @@
+FROM alpine:3.17.7 AS build_stage
+{{- if .build.options.env }}
+ENV{{ range $key, $value := .build.options.env }} {{ $key }}={{ $value }} {{ end }}
+{{- end }}
+{{ if .build.options.debug }}ENV DEBUG_MODE=true{{end}}
+# Install compile dependencies
+RUN echo ">>> $(uname -m) <<<" && sleep 3 && \
+    touch /stage1-$(uname -m) && \
+    apk add --no-cache {{ range .app.dependencies.compile }}{{ . }} {{ end }}
+WORKDIR /app
+COPY . /app
+RUN make
+
+
+FROM alpine:3.17.7 AS app_container
+COPY --from=build_stage /app/target/noarch/. /
+COPY --from=build_stage /app/build/. /
+COPY --from=build_stage /app/target/. /target
+# Install runtime dependencies
+RUN touch /stage2-$(uname -m) && \
+    apk add --no-cache {{ range .app.dependencies.runtime }}{{ . }} {{ end }}
+{{- if .build.options.debug }}gdb{{- end }} && \
+    cp -av /target/$(uname -m)/. / && \
+    apk list > /$(uname -m) && \
+    rm -fr /target /var/cache/apk/* /tmp/* /var/tmp/*
+{{ if not .build.options.debug }}
+# Cleanup
+RUN apk --purge del apk-tools alpine-keys && \
+    rm -rf /linuxrc /lib/apk/ /root /media #/var
+{{ end }}
+
+FROM scratch AS final_stage
+{{- if .app.env }}
+ENV{{ range $key, $value := .app.env }} {{ $key }}={{ $value }} {{ end }}
+{{- end }}
+COPY --from=app_container / /
+RUN touch /{{ .app.name }}-$(uname -m)
+ENTRYPOINT [ "{{ .app.entrypoint }}" ]
