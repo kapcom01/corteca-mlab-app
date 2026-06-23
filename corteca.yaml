@@ -8,7 +8,7 @@ app:
     - ca-certificates
   duid: a88e83ee-1f27-57fa-87f9-db4342ad0130
   name: mlabs-speedtest
-  version: 3.0.1
+  version: 3.0.2
   entrypoint:
     - /bin/mlabs-nokia
   runtime:
