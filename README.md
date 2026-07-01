@@ -37,3 +37,17 @@ corteca build -c 'build.options.outputType=oci' aarch64
 corteca build -c 'build.options.outputType=oci' armv7l
 corteca build -c 'build.options.outputType=oci' x86_64
 ```
+
+### Install application on prplOS VM
+
+1. Create self-signed certificate for local Registry:
+```shell
+openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes -keyout .corteca/certs/local-registry.key -out .corteca/certs/local-registry.crt -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+```
+
+2. Uncomment `certificate` and `key` fields in `corteca.yaml`
+
+3. Install application:
+```shell
+corteca exec install qemu --publish localregistry
+```

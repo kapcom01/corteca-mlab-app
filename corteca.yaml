@@ -6,7 +6,7 @@ app:
     - make
     runtime:
     - ca-certificates
-  duid: a88e83ee-1f27-57fa-87f9-db4342ad0130
+  duid: 1c4f86b1-35ec-5a2c-997a-f1fa9271b8bf
   name: mlabs-speedtest
   version: 3.0.2
   entrypoint:
@@ -26,3 +26,40 @@ app:
     ociVersion: "1.0.0"
 templates:
   .corteca/Dockerfile.template: Dockerfile
+sequences:
+  install:
+      - cmd: "sed -i 's/%read-only bool CertificateVerification/bool CertificateVerification/' /etc/amx/rlyeh/rlyeh_definition.odl"
+        delay: 1000
+      - cmd: "killall rlyeh"
+        delay: 3000
+      - cmd: "rlyeh -D"
+        delay: 1000
+      - cmd: "ps aux |grep rlyeh |grep -v grep"
+        retries: 30
+      - cmd: "ba-cli \"Rlyeh.CertificateVerification=0\""
+        delay: 1000
+      - cmd: "ba-cli "
+        params: 
+          - "\"SoftwareModules.InstallDU("
+          - "URL = 'docker://${.host.addr}:8080/${.app.name}:${.app.version}',"
+          - "ExecutionEnvRef = 'generic',"
+          - "UUID = 'aade1eee-8ee1-5690-887f-b41aab7ca15e',"
+          - "NumRequiredUIDs=10,"
+          - "NetworkConfig = {"
+          - "'PortForwarding' = [{'Interface' = 'Wan', 'ExternalPort' = 18000, 'InternalPort' = 18000, 'Protocol' = 'TCP'}],"
+          - "'AccessInterfaces' = [{'Reference' = 'Wan'}]"
+          - "})\""
+      - cmd: "lxc-ls -f |grep -o ${.app.duid}"
+        delay: 1000
+        retries: 10
+devices:
+  qemu:
+    addr: ssh://root@127.0.0.1:2222
+publish:
+  localregistry:
+    method: registry-v2
+    addr: "0.0.0.0:8080"
+    namespace: "${.app.name}"
+    reference: "${.app.version}"
+    # certificate: .corteca/certs/local-registry.crt
+    # key: .corteca/certs/local-registry.key
