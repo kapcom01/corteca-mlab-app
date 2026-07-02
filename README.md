@@ -42,6 +42,7 @@ corteca build -c 'build.options.outputType=oci' x86_64
 
 1. Create self-signed certificate for local Registry:
 ```shell
+mkdir .corteca/certs
 openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes -keyout .corteca/certs/local-registry.key -out .corteca/certs/local-registry.crt -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 ```
 
